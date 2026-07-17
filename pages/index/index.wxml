@@ -1,0 +1,42 @@
+<!--index.wxml-->
+<navigation-bar title="{{loggedIn ? '问卷发起人' : '微信登录'}}" back="{{false}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view wx:if="{{!loggedIn}}" class="login-page">
+    <view class="login-panel">
+      <view class="wechat-mark">微</view>
+      <view class="login-title">微信快捷登录</view>
+      <view class="login-desc">点击按钮后将调用微信登录能力，获取用于服务端换取用户身份的临时 code。</view>
+      <button
+        class="wechat-login-button"
+        bindtap="onWechatLogin"
+        loading="{{loggingIn}}"
+        disabled="{{loggingIn}}"
+      >
+        微信登录
+      </button>
+    </view>
+  </view>
+
+  <view wx:else class="dashboard-page">
+    <view class="dashboard-header">
+      <view class="dashboard-title">问卷发起人</view>
+      <view class="dashboard-desc">创建问卷模板，分享给填写人，并按模板查看收集到的信息。</view>
+    </view>
+
+    <view class="action-list">
+      <view
+        wx:for="{{actions}}"
+        wx:key="key"
+        class="action-card"
+        bindtap="onOpenAction"
+        data-url="{{item.url}}"
+      >
+        <view class="action-content">
+          <view class="action-title">{{item.title}}</view>
+          <view class="action-desc">{{item.desc}}</view>
+        </view>
+        <view class="action-arrow">›</view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

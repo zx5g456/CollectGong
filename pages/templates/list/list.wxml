@@ -1,0 +1,17 @@
+<navigation-bar title="已有模板" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="page">
+    <view class="title">已有模板</view>
+    <view class="desc">查看创建过的问卷模板，并分享给填写人。</view>
+
+    <view class="template-list">
+      <view wx:for="{{templates}}" wx:key="id" class="template-card">
+        <view class="template-info">
+          <view class="template-name">{{item.name}}</view>
+          <view class="template-meta">已收集 {{item.count}} 条 · {{item.updatedAt}}</view>
+        </view>
+        <button class="share-button" bindtap="onShareTemplate" data-name="{{item.name}}">分享</button>
+      </view>
+    </view>
+  </view>
+</scroll-view>

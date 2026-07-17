@@ -1,0 +1,17 @@
+<navigation-bar title="收集信息" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="page">
+    <view class="title">按模板查看信息</view>
+    <view class="desc">每个模板下展示填写情况、填写人相关信息，并支持按时间排序。</view>
+
+    <view class="record-list">
+      <view wx:for="{{groups}}" wx:key="id" class="record-card">
+        <view>
+          <view class="record-name">{{item.name}}</view>
+          <view class="record-meta">共 {{item.count}} 条填写</view>
+        </view>
+        <view class="record-time">{{item.latestAt}}</view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

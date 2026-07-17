@@ -1,0 +1,112 @@
+<navigation-bar title="创建模板" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="page">
+    <view class="title">创建问卷模板</view>
+    <view class="desc">配置填写人看到的每一项内容，包括标题、说明、输入类型和示例值。</view>
+
+    <view class="form-section">
+      <view class="section-title">模板名称</view>
+      <input
+        class="text-input"
+        value="{{templateName}}"
+        placeholder="请输入模板名称"
+        bindinput="onTemplateNameInput"
+      />
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">填写项</view>
+      <view wx:for="{{fields}}" wx:key="id" class="field-editor">
+        <view class="field-editor-header">
+          <view class="field-editor-title">字段 {{index + 1}}</view>
+          <button class="ghost-button" bindtap="onRemoveField" data-index="{{index}}">删除</button>
+        </view>
+
+        <view class="control">
+          <view class="control-label">标题</view>
+          <input
+            class="text-input"
+            value="{{item.title}}"
+            placeholder="例如：面额100元"
+            data-index="{{index}}"
+            data-key="title"
+            bindinput="onFieldInput"
+          />
+        </view>
+
+        <view class="control">
+          <view class="control-label">说明</view>
+          <input
+            class="text-input"
+            value="{{item.description}}"
+            placeholder="例如：无需则填0；需要则填写金额（元）"
+            data-index="{{index}}"
+            data-key="description"
+            bindinput="onFieldInput"
+          />
+        </view>
+
+        <view class="control-row">
+          <view class="control type-control">
+            <view class="control-label">输入类型</view>
+            <picker
+              range="{{fieldTypes}}"
+              range-key="label"
+              value="{{activeTypeIndex}}"
+              data-index="{{index}}"
+              bindchange="onTypeChange"
+            >
+              <view class="picker-value">
+                <text wx:if="{{item.type === 'number'}}">金额</text>
+                <text wx:elif="{{item.type === 'tel'}}">手机号</text>
+                <text wx:else>文本</text>
+              </view>
+            </picker>
+          </view>
+
+          <view class="required-control">
+            <text>必填</text>
+            <switch
+              checked="{{item.required}}"
+              data-index="{{index}}"
+              color="#4f7df3"
+              bindchange="onRequiredChange"
+            />
+          </view>
+        </view>
+
+        <view class="control">
+          <view class="control-label">示例/占位内容</view>
+          <input
+            class="text-input"
+            value="{{item.placeholder}}"
+            placeholder="例如：10000"
+            data-index="{{index}}"
+            data-key="placeholder"
+            bindinput="onFieldInput"
+          />
+        </view>
+      </view>
+
+      <button class="secondary-button" bindtap="onAddAmountField">添加金额填写项</button>
+    </view>
+
+    <view class="preview-section">
+      <view class="section-title">填写预览</view>
+      <view class="preview-card">
+        <view wx:for="{{fields}}" wx:key="id" class="preview-field">
+          <view class="preview-title">{{index + 1}}. {{item.title}}</view>
+          <view class="preview-desc">{{item.description}}</view>
+          <input
+            class="preview-input"
+            type="{{item.type}}"
+            value="{{item.placeholder}}"
+            disabled
+          />
+        </view>
+      </view>
+    </view>
+
+    <button class="primary-button" bindtap="onSaveTemplate">保存模板</button>
+  </view>
+</scroll-view>
