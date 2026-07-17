@@ -20,6 +20,11 @@ const callContainer = ({ path, method = 'GET', data = {} }) => {
       data,
       success: (res) => {
         const body = res.data || {}
+        if (body.code && body.code !== 0) {
+          reject(new Error(body.message || '服务器请求失败'))
+          return
+        }
+
         if (body.success === false) {
           reject(new Error(body.message || '服务器请求失败'))
           return
