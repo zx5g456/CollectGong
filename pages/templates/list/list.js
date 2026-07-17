@@ -28,10 +28,41 @@ Component({
     },
   },
   methods: {
+    toTemplateArray(value) {
+      if (Array.isArray(value)) {
+        return value
+      }
+
+      if (!value || typeof value !== 'object') {
+        return []
+      }
+
+      if (Array.isArray(value.data)) {
+        return value.data
+      }
+
+      if (Array.isArray(value.list)) {
+        return value.list
+      }
+
+      if (Array.isArray(value.templates)) {
+        return value.templates
+      }
+
+      if (value.name || value.templateName || value.title) {
+        return [value]
+      }
+
+      return []
+    },
     normalizeTemplates(templates) {
-      return templates
+      return this.toTemplateArray(templates)
         .map((template, index) => {
           const source = template && (template.dataValues || template)
+          if (!source) {
+            return null
+          }
+
           const name = source.name || source.templateName || source.title || ''
           const count = source.count === undefined || source.count === null ? 0 : source.count
           const updatedAt = source.updatedAt || source.latestAt || source.displayUpdatedAt || ''
@@ -51,9 +82,10 @@ Component({
 
       try {
         const remoteTemplates = await api.listTemplates()
-        if (remoteTemplates && remoteTemplates.length) {
+        const normalizedRemoteTemplates = this.normalizeTemplates(remoteTemplates)
+        if (normalizedRemoteTemplates.length) {
           this.setData({
-            templates: this.normalizeTemplates(remoteTemplates),
+            templates: normalizedRemoteTemplates,
           })
           return
         }
@@ -61,12 +93,16 @@ Component({
         console.error('load templates failed:', error)
       }
 
-      if (!savedTemplates.length) {
+      const normalizedSavedTemplates = this.normalizeTemplates(savedTemplates)
+      if (!normalizedSavedTemplates.length) {
+        if (savedTemplates && !Array.isArray(savedTemplates)) {
+          wx.removeStorageSync('templates')
+        }
         return
       }
 
       this.setData({
-        templates: this.normalizeTemplates(savedTemplates),
+        templates: normalizedSavedTemplates,
       })
     },
     onShareTemplate(e) {
