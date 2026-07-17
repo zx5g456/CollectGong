@@ -25,8 +25,18 @@ Component({
       },
     ],
   },
+  lifetimes: {
+    attached() {
+      const user = wx.getStorageSync('user')
+      if (user && user.openid) {
+        this.setData({
+          loggedIn: true,
+        })
+      }
+    },
+  },
   methods: {
-    onWechatLogin() {
+    async onWechatLogin() {
       if (this.data.loggingIn) {
         return
       }
@@ -35,47 +45,27 @@ Component({
         loggingIn: true,
       })
 
-      wx.login({
-        success: async (res) => {
-          if (!res.code) {
-            wx.showToast({
-              title: '登录失败',
-              icon: 'none',
-            })
-            return
-          }
-
-          console.log('wx.login code:', res.code)
-          try {
-            const user = await api.loginUser()
-            wx.setStorageSync('user', user)
-            this.setData({
-              loggedIn: true,
-            })
-            wx.showToast({
-              title: '登录成功',
-              icon: 'success',
-            })
-          } catch (error) {
-            console.error('login user failed:', error)
-            wx.showToast({
-              title: '用户保存失败',
-              icon: 'none',
-            })
-          }
-        },
-        fail: () => {
-          wx.showToast({
-            title: '登录失败',
-            icon: 'none',
-          })
-        },
-        complete: () => {
-          this.setData({
-            loggingIn: false,
-          })
-        },
-      })
+      try {
+        const user = await api.loginUser()
+        wx.setStorageSync('user', user)
+        this.setData({
+          loggedIn: true,
+        })
+        wx.showToast({
+          title: '登录成功',
+          icon: 'success',
+        })
+      } catch (error) {
+        console.error('login user failed:', error)
+        wx.showToast({
+          title: '登录失败',
+          icon: 'none',
+        })
+      } finally {
+        this.setData({
+          loggingIn: false,
+        })
+      }
     },
     onOpenAction(e) {
       const { url } = e.currentTarget.dataset

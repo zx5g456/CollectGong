@@ -66,13 +66,18 @@ page {
 }
 
 .share-button {
+  flex: none;
   width: 132rpx;
+  min-width: 132rpx;
   height: 72rpx;
   margin-left: 24rpx;
+  padding: 0;
+  box-sizing: border-box;
   border-radius: 8px;
   background: #07c160;
   color: #ffffff;
   font-size: 28rpx;
+  line-height: 72rpx;
 }
 
 .share-button::after {

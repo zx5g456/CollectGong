@@ -129,7 +129,7 @@ Component({
 
       try {
         const savedTemplate = await api.createTemplate(template)
-        const nextTemplate = savedTemplate || template
+        const nextTemplate = savedTemplate && savedTemplate.name ? savedTemplate : template
 
         wx.setStorageSync('templates', [nextTemplate].concat(templates))
         wx.showToast({

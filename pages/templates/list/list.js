@@ -28,6 +28,24 @@ Component({
     },
   },
   methods: {
+    normalizeTemplates(templates) {
+      return templates
+        .map((template, index) => {
+          const source = template && (template.dataValues || template)
+          const name = source.name || source.templateName || source.title || ''
+          const count = source.count === undefined || source.count === null ? 0 : source.count
+          const updatedAt = source.updatedAt || source.latestAt || source.displayUpdatedAt || ''
+
+          return {
+            ...source,
+            id: source.id || source._id || `template_${index}`,
+            name: name || '未命名模板',
+            count,
+            updatedAt: updatedAt || '暂无时间',
+          }
+        })
+        .filter((template) => template && template.id)
+    },
     async loadTemplates() {
       const savedTemplates = wx.getStorageSync('templates') || []
 
@@ -35,7 +53,7 @@ Component({
         const remoteTemplates = await api.listTemplates()
         if (remoteTemplates && remoteTemplates.length) {
           this.setData({
-            templates: remoteTemplates,
+            templates: this.normalizeTemplates(remoteTemplates),
           })
           return
         }
@@ -48,7 +66,7 @@ Component({
       }
 
       this.setData({
-        templates: savedTemplates,
+        templates: this.normalizeTemplates(savedTemplates),
       })
     },
     onShareTemplate(e) {
