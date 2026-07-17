@@ -1,6 +1,14 @@
 // app.js
+const { cloudEnv } = require('./utils/api')
+
 App({
   onLaunch() {
+    if (wx.cloud) {
+      wx.cloud.init({
+        env: cloudEnv,
+      })
+    }
+
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())

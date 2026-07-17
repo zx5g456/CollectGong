@@ -1,3 +1,5 @@
+const api = require('../../../utils/api')
+
 Component({
   data: {
     templateName: '费用登记',
@@ -84,7 +86,7 @@ Component({
         fields,
       })
     },
-    onSaveTemplate() {
+    async onSaveTemplate() {
       const templateName = this.data.templateName.trim()
       const fields = this.data.fields.map((field) => ({
         ...field,
@@ -120,11 +122,30 @@ Component({
         updatedAt: this.formatTime(new Date(now)),
       }
 
-      wx.setStorageSync('templates', [template].concat(templates))
-      wx.showToast({
-        title: '已保存',
-        icon: 'success',
+      wx.showLoading({
+        title: '保存中',
+        mask: true,
       })
+
+      try {
+        const savedTemplate = await api.createTemplate(template)
+        const nextTemplate = savedTemplate || template
+
+        wx.setStorageSync('templates', [nextTemplate].concat(templates))
+        wx.showToast({
+          title: '已保存',
+          icon: 'success',
+        })
+      } catch (error) {
+        console.error('save template failed:', error)
+        wx.setStorageSync('templates', [template].concat(templates))
+        wx.showToast({
+          title: '已本地保存',
+          icon: 'none',
+        })
+      } finally {
+        wx.hideLoading()
+      }
     },
     formatTime(date) {
       const formatNumber = (n) => {

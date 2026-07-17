@@ -1,3 +1,5 @@
+const api = require('../../../utils/api')
+
 Component({
   data: {
     templates: [
@@ -26,8 +28,21 @@ Component({
     },
   },
   methods: {
-    loadTemplates() {
+    async loadTemplates() {
       const savedTemplates = wx.getStorageSync('templates') || []
+
+      try {
+        const remoteTemplates = await api.listTemplates()
+        if (remoteTemplates && remoteTemplates.length) {
+          this.setData({
+            templates: remoteTemplates,
+          })
+          return
+        }
+      } catch (error) {
+        console.error('load templates failed:', error)
+      }
+
       if (!savedTemplates.length) {
         return
       }
