@@ -2,6 +2,7 @@ const api = require('../../../utils/api')
 
 Component({
   data: {
+    shareTemplate: null,
     templates: [
       {
         id: 'visitor',
@@ -105,12 +106,16 @@ Component({
         templates: normalizedSavedTemplates,
       })
     },
-    onShareTemplate(e) {
-      const { name } = e.currentTarget.dataset
-      wx.showToast({
-        title: `分享${name}`,
-        icon: 'none',
-      })
+    onShareTemplate() {},
+    onShareAppMessage(res) {
+      const dataset = res && res.target ? res.target.dataset : {}
+      const templateId = dataset.id || ''
+      const templateName = dataset.name || '问卷模板'
+
+      return {
+        title: `请填写：${templateName}`,
+        path: `/pages/templates/fill/fill?templateId=${templateId}`,
+      }
     },
   },
 })

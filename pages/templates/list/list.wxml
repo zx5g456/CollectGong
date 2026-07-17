@@ -10,7 +10,15 @@
           <view class="template-name">{{item.name}}</view>
           <view class="template-meta">已收集 {{item.count}} 条 · {{item.updatedAt}}</view>
         </view>
-        <button class="share-button" bindtap="onShareTemplate" data-name="{{item.name}}">分享</button>
+        <button
+          class="share-button"
+          open-type="share"
+          bindtap="onShareTemplate"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+        >
+          分享
+        </button>
       </view>
     </view>
   </view>

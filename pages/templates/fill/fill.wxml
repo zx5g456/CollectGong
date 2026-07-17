@@ -1,0 +1,35 @@
+<navigation-bar title="填写信息" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="page">
+    <view class="title">{{template.name || '填写信息'}}</view>
+    <view class="desc">请根据表单要求填写信息，提交后发起人可以在收集信息中查看。</view>
+
+    <view wx:if="{{loading}}" class="empty-card">加载中...</view>
+
+    <view wx:elif="{{!template}}" class="empty-card">模板不存在或已失效</view>
+
+    <view wx:else class="form-card">
+      <view wx:for="{{fields}}" wx:key="id" class="field-item">
+        <view class="field-title">{{index + 1}}. {{item.title}}</view>
+        <view wx:if="{{item.description}}" class="field-desc">{{item.description}}</view>
+        <input
+          class="field-input"
+          type="{{item.type}}"
+          placeholder="{{item.placeholder || '请输入'}}"
+          value="{{formData[item.id]}}"
+          data-field-id="{{item.id}}"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <button
+        class="submit-button"
+        loading="{{submitting}}"
+        disabled="{{submitting}}"
+        bindtap="onSubmit"
+      >
+        提交
+      </button>
+    </view>
+  </view>
+</scroll-view>

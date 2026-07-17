@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/templates/create/create",
     "pages/templates/list/list",
+    "pages/templates/fill/fill",
     "pages/records/list/list",
     "pages/logs/logs"
   ],

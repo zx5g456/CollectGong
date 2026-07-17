@@ -37,14 +37,19 @@ page {
   gap: 24rpx;
 }
 
+.record-group {
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12rpx 36rpx rgba(20, 31, 51, 0.06);
+  overflow: hidden;
+}
+
 .record-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 32rpx;
-  border-radius: 8px;
   background: #ffffff;
-  box-shadow: 0 12rpx 36rpx rgba(20, 31, 51, 0.06);
 }
 
 .record-name {
@@ -64,4 +69,43 @@ page {
   color: #4f7df3;
   font-size: 24rpx;
   text-align: right;
+}
+
+.submission-list {
+  padding: 0 32rpx 32rpx;
+}
+
+.empty-text {
+  padding-top: 20rpx;
+  color: #697386;
+  font-size: 26rpx;
+}
+
+.submission-card {
+  padding: 24rpx 0;
+  border-top: 1rpx solid #e7eaf0;
+}
+
+.submission-time {
+  color: #697386;
+  font-size: 24rpx;
+}
+
+.submission-row {
+  margin-top: 14rpx;
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+  color: #17233d;
+  font-size: 27rpx;
+}
+
+.submission-key {
+  color: #697386;
+}
+
+.submission-value {
+  flex: 1;
+  text-align: right;
+  word-break: break-all;
 }

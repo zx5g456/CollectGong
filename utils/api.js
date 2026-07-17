@@ -59,9 +59,29 @@ const listTemplates = () => {
   })
 }
 
+const getTemplate = (templateId) => {
+  return callContainer({
+    path: `/api/templates/${templateId}`,
+  })
+}
+
 const listRecordGroups = () => {
   return callContainer({
     path: '/api/records/groups',
+  })
+}
+
+const listRecords = (templateId) => {
+  return callContainer({
+    path: `/api/records?templateId=${templateId}`,
+  })
+}
+
+const submitRecord = (record) => {
+  return callContainer({
+    path: '/api/records',
+    method: 'POST',
+    data: record,
   })
 }
 
@@ -72,5 +92,8 @@ module.exports = {
   loginUser,
   createTemplate,
   listTemplates,
+  getTemplate,
   listRecordGroups,
+  listRecords,
+  submitRecord,
 }

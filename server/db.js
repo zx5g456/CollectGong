@@ -7,8 +7,16 @@ const {
 } = process.env
 
 const [host, port] = MYSQL_ADDRESS.split(':')
+const database = 'collect_gong'
 
-const sequelize = new Sequelize('collect_gong', MYSQL_USERNAME, MYSQL_PASSWORD, {
+const baseSequelize = new Sequelize('', MYSQL_USERNAME, MYSQL_PASSWORD, {
+  host,
+  port,
+  dialect: 'mysql',
+  logging: false,
+})
+
+const sequelize = new Sequelize(database, MYSQL_USERNAME, MYSQL_PASSWORD, {
   host,
   port,
   dialect: 'mysql',
@@ -91,6 +99,9 @@ const Record = sequelize.define('Record', {
 })
 
 async function init() {
+  await baseSequelize.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`)
+  await baseSequelize.close()
+  await sequelize.authenticate()
   await User.sync({ alter: true })
   await Template.sync({ alter: true })
   await Record.sync({ alter: true })

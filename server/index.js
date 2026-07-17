@@ -137,6 +137,21 @@ app.get('/api/templates', async (req, res) => {
   }
 })
 
+app.get('/api/templates/:id', async (req, res) => {
+  try {
+    const template = await Template.findByPk(req.params.id)
+
+    if (!template) {
+      sendFail(res, new Error('模板不存在'), 404)
+      return
+    }
+
+    sendOk(res, serializeTemplate(template))
+  } catch (error) {
+    sendFail(res, error)
+  }
+})
+
 app.post('/api/templates', async (req, res) => {
   try {
     const openid = getOpenid(req)
@@ -162,6 +177,59 @@ app.post('/api/templates', async (req, res) => {
     })
 
     sendOk(res, serializeTemplate(template))
+  } catch (error) {
+    sendFail(res, error)
+  }
+})
+
+app.get('/api/records', async (req, res) => {
+  try {
+    const openid = getOpenid(req)
+    const templateId = req.query.templateId
+
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
+
+    if (!templateId) {
+      sendFail(res, new Error('模板 ID 不能为空'), 400)
+      return
+    }
+
+    const template = await Template.findByPk(templateId)
+    if (!template) {
+      sendFail(res, new Error('模板不存在'), 404)
+      return
+    }
+
+    if (template.creatorOpenid !== openid) {
+      sendFail(res, new Error('无权查看该模板数据'), 403)
+      return
+    }
+
+    const records = await Record.findAll({
+      where: {
+        templateId,
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 200,
+    })
+    const fields = Array.isArray(template.fields) ? template.fields : []
+
+    sendOk(res, records.map((record) => ({
+      id: record.id,
+      templateId: record.templateId,
+      templateName: record.templateName,
+      submitterName: record.submitterName,
+      data: record.data || {},
+      values: fields.map((field) => ({
+        key: field.id,
+        label: field.title,
+        value: (record.data || {})[field.id] || '',
+      })),
+      createdAt: formatTime(record.createdAt),
+    })))
   } catch (error) {
     sendFail(res, error)
   }
@@ -258,4 +326,7 @@ async function bootstrap() {
   })
 }
 
-bootstrap()
+bootstrap().catch((error) => {
+  console.error('启动失败', error)
+  process.exit(1)
+})
