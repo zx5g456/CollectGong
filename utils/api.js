@@ -45,6 +45,14 @@ const createTemplate = (template) => {
   })
 }
 
+const loginUser = (userInfo = {}) => {
+  return callContainer({
+    path: '/api/users/login',
+    method: 'POST',
+    data: userInfo,
+  })
+}
+
 const listTemplates = () => {
   return callContainer({
     path: '/api/templates',
@@ -61,6 +69,7 @@ module.exports = {
   cloudEnv,
   cloudService,
   callContainer,
+  loginUser,
   createTemplate,
   listTemplates,
   listRecordGroups,

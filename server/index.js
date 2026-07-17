@@ -2,7 +2,7 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-const { init: initDB, Template, Record } = require('./db')
+const { init: initDB, User, Template, Record } = require('./db')
 
 const app = express()
 const logger = morgan('tiny')
@@ -47,10 +47,13 @@ const formatTime = (date) => {
 const serializeTemplate = (template) => ({
   id: template.id,
   name: template.name,
+  creatorOpenid: template.creatorOpenid,
   fields: template.fields || [],
   count: template.count || 0,
   updatedAt: template.displayUpdatedAt || formatTime(template.updatedAt),
 })
+
+const getOpenid = (req) => req.headers['x-wx-openid'] || ''
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
@@ -65,16 +68,65 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/wx_openid', (req, res) => {
   if (req.headers['x-wx-source']) {
-    res.send(req.headers['x-wx-openid'])
+    res.send(getOpenid(req))
     return
   }
 
   res.send('')
 })
 
+app.post('/api/users/login', async (req, res) => {
+  try {
+    const openid = getOpenid(req)
+    const body = req.body || {}
+
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
+
+    const [user] = await User.findOrCreate({
+      where: {
+        openid,
+      },
+      defaults: {
+        openid,
+        nickName: body.nickName || '',
+        avatarUrl: body.avatarUrl || '',
+        lastLoginAt: new Date(),
+      },
+    })
+
+    await user.update({
+      nickName: body.nickName || user.nickName || '',
+      avatarUrl: body.avatarUrl || user.avatarUrl || '',
+      lastLoginAt: new Date(),
+    })
+
+    sendOk(res, {
+      id: user.id,
+      openid: user.openid,
+      nickName: user.nickName,
+      avatarUrl: user.avatarUrl,
+      lastLoginAt: formatTime(user.lastLoginAt),
+    })
+  } catch (error) {
+    sendFail(res, error)
+  }
+})
+
 app.get('/api/templates', async (req, res) => {
   try {
+    const openid = getOpenid(req)
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
+
     const templates = await Template.findAll({
+      where: {
+        creatorOpenid: openid,
+      },
       order: [['createdAt', 'DESC']],
       limit: 100,
     })
@@ -87,8 +139,14 @@ app.get('/api/templates', async (req, res) => {
 
 app.post('/api/templates', async (req, res) => {
   try {
+    const openid = getOpenid(req)
     const body = req.body || {}
     const name = body.name && body.name.trim()
+
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
 
     if (!name) {
       sendFail(res, new Error('模板名称不能为空'), 400)
@@ -96,6 +154,7 @@ app.post('/api/templates', async (req, res) => {
     }
 
     const template = await Template.create({
+      creatorOpenid: openid,
       name,
       fields: body.fields || [],
       count: 0,
@@ -110,7 +169,16 @@ app.post('/api/templates', async (req, res) => {
 
 app.get('/api/records/groups', async (req, res) => {
   try {
+    const openid = getOpenid(req)
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
+
     const templates = await Template.findAll({
+      where: {
+        creatorOpenid: openid,
+      },
       order: [['createdAt', 'DESC']],
       limit: 100,
     })

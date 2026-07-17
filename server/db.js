@@ -15,7 +15,34 @@ const sequelize = new Sequelize('collect_gong', MYSQL_USERNAME, MYSQL_PASSWORD, 
   logging: false,
 })
 
+const User = sequelize.define('User', {
+  openid: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  nickName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: '',
+  },
+  avatarUrl: {
+    type: DataTypes.STRING(1024),
+    allowNull: false,
+    defaultValue: '',
+  },
+  lastLoginAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+})
+
 const Template = sequelize.define('Template', {
+  creatorOpenid: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: '',
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -64,12 +91,14 @@ const Record = sequelize.define('Record', {
 })
 
 async function init() {
+  await User.sync({ alter: true })
   await Template.sync({ alter: true })
   await Record.sync({ alter: true })
 }
 
 module.exports = {
   init,
+  User,
   Template,
   Record,
 }

@@ -1,3 +1,5 @@
+const api = require('../../utils/api')
+
 Component({
   data: {
     loggingIn: false,
@@ -34,7 +36,7 @@ Component({
       })
 
       wx.login({
-        success: (res) => {
+        success: async (res) => {
           if (!res.code) {
             wx.showToast({
               title: '登录失败',
@@ -44,13 +46,23 @@ Component({
           }
 
           console.log('wx.login code:', res.code)
-          this.setData({
-            loggedIn: true,
-          })
-          wx.showToast({
-            title: '登录成功',
-            icon: 'success',
-          })
+          try {
+            const user = await api.loginUser()
+            wx.setStorageSync('user', user)
+            this.setData({
+              loggedIn: true,
+            })
+            wx.showToast({
+              title: '登录成功',
+              icon: 'success',
+            })
+          } catch (error) {
+            console.error('login user failed:', error)
+            wx.showToast({
+              title: '用户保存失败',
+              icon: 'none',
+            })
+          }
         },
         fail: () => {
           wx.showToast({
