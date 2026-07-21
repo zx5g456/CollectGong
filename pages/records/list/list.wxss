@@ -85,6 +85,20 @@ page {
   padding: 0 32rpx 32rpx;
 }
 
+.export-button {
+  height: 80rpx;
+  margin: 0 0 24rpx;
+  border-radius: 8px;
+  background: #4f7df3;
+  color: #ffffff;
+  font-size: 28rpx;
+  line-height: 80rpx;
+}
+
+.export-button::after {
+  border: 0;
+}
+
 .empty-text {
   padding-top: 20rpx;
   color: #697386;

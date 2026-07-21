@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const ExcelJS = require('exceljs')
 const { init: initDB, User, Template, Record } = require('./db')
 
 const app = express()
@@ -54,6 +55,17 @@ const serializeTemplate = (template) => ({
 })
 
 const getOpenid = (req) => req.headers['x-wx-openid'] || ''
+
+const sanitizeFileName = (name) => {
+  return `${name || '问卷'}`.replace(/[\\/:*?"<>|]/g, '_')
+}
+
+const formatDateForFileName = (date) => {
+  const value = new Date(date)
+  const pad = (number) => number.toString().padStart(2, '0')
+
+  return `${value.getFullYear()}${pad(value.getMonth() + 1)}${pad(value.getDate())}`
+}
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
@@ -230,6 +242,71 @@ app.get('/api/records', async (req, res) => {
       })),
       createdAt: formatTime(record.createdAt),
     })))
+  } catch (error) {
+    sendFail(res, error)
+  }
+})
+
+app.get('/api/records/export', async (req, res) => {
+  try {
+    const openid = getOpenid(req)
+    const templateId = req.query.templateId
+
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
+
+    if (!templateId) {
+      sendFail(res, new Error('模板 ID 不能为空'), 400)
+      return
+    }
+
+    const template = await Template.findByPk(templateId)
+    if (!template) {
+      sendFail(res, new Error('模板不存在'), 404)
+      return
+    }
+
+    if (template.creatorOpenid !== openid) {
+      sendFail(res, new Error('无权导出该模板数据'), 403)
+      return
+    }
+
+    const records = await Record.findAll({
+      where: {
+        templateId,
+      },
+      order: [['createdAt', 'ASC']],
+      limit: 5000,
+    })
+    const fields = Array.isArray(template.fields) ? template.fields : []
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('收集信息')
+
+    worksheet.addRow(fields.map((field) => field.title || '未命名填写项'))
+    worksheet.addRow(fields.map((field) => field.description || ''))
+
+    records.forEach((record) => {
+      const data = record.data || {}
+      worksheet.addRow(fields.map((field) => data[field.id] || ''))
+    })
+
+    worksheet.columns.forEach((column) => {
+      column.width = 22
+    })
+    worksheet.getRow(1).font = {
+      bold: true,
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer()
+    const fileName = `${sanitizeFileName(template.name)}${formatDateForFileName(new Date())}.xlsx`
+
+    sendOk(res, {
+      fileName,
+      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      base64: Buffer.from(buffer).toString('base64'),
+    })
   } catch (error) {
     sendFail(res, error)
   }

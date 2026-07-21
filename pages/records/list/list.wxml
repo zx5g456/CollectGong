@@ -16,6 +16,16 @@
         </view>
 
         <view wx:if="{{activeTemplateId === item.id}}" class="submission-list">
+          <button
+            class="export-button"
+            bindtap="onExportGroup"
+            data-id="{{item.id}}"
+            loading="{{exportingTemplateId === item.id}}"
+            disabled="{{!!exportingTemplateId}}"
+          >
+            导出 Excel
+          </button>
+
           <view wx:if="{{loadingRecords}}" class="empty-text">加载中...</view>
           <view wx:elif="{{!records.length}}" class="empty-text">暂无提交记录</view>
           <block wx:else>

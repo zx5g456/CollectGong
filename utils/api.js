@@ -77,6 +77,12 @@ const listRecords = (templateId) => {
   })
 }
 
+const exportRecords = (templateId) => {
+  return callContainer({
+    path: `/api/records/export?templateId=${templateId}`,
+  })
+}
+
 const submitRecord = (record) => {
   return callContainer({
     path: '/api/records',
@@ -95,5 +101,6 @@ module.exports = {
   getTemplate,
   listRecordGroups,
   listRecords,
+  exportRecords,
   submitRecord,
 }
