@@ -5,6 +5,7 @@
     <view class="desc">每个模板下展示填写情况、填写人相关信息，并支持按时间排序。</view>
 
     <view class="record-list">
+      <view wx:if="{{!groups.length}}" class="empty-card">暂无收集信息</view>
       <view wx:for="{{groups}}" wx:key="id" class="record-group">
         <view class="record-card" bindtap="onOpenGroup" data-id="{{item.id}}">
           <view>

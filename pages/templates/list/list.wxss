@@ -47,6 +47,16 @@ page {
   box-shadow: 0 12rpx 36rpx rgba(20, 31, 51, 0.06);
 }
 
+.empty-card {
+  padding: 48rpx 32rpx;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #697386;
+  font-size: 28rpx;
+  text-align: center;
+  box-shadow: 0 12rpx 36rpx rgba(20, 31, 51, 0.06);
+}
+
 .template-info {
   flex: 1;
   min-width: 0;

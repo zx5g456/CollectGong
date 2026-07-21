@@ -2,7 +2,7 @@ const api = require('../../../utils/api')
 
 Component({
   data: {
-    templateName: '费用登记',
+    templateName: '',
     fieldTypes: [
       {
         label: '金额',
@@ -21,9 +21,9 @@ Component({
     fields: [
       {
         id: 1,
-        title: '面额100元',
-        description: '无需则填0；需要则填写金额（元）',
-        placeholder: '10000',
+        title: '',
+        description: '',
+        placeholder: '',
         type: 'number',
         required: true,
       },
@@ -63,9 +63,9 @@ Component({
       this.setData({
         fields: this.data.fields.concat({
           id: nextId,
-          title: `面额${nextIndex}00元`,
-          description: '无需则填0；需要则填写金额（元）',
-          placeholder: '0',
+          title: '',
+          description: '',
+          placeholder: '',
           type: 'number',
           required: true,
         }),

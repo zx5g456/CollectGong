@@ -5,6 +5,7 @@
     <view class="desc">查看创建过的问卷模板，并分享给填写人。</view>
 
     <view class="template-list">
+      <view wx:if="{{!templates.length}}" class="empty-card">暂无模板</view>
       <view wx:for="{{templates}}" wx:key="id" class="template-card">
         <view class="template-info">
           <view class="template-name">{{item.name}}</view>
