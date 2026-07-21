@@ -17,13 +17,15 @@
         <view wx:if="{{activeTemplateId === item.id}}" class="submission-list">
           <view wx:if="{{loadingRecords}}" class="empty-text">加载中...</view>
           <view wx:elif="{{!records.length}}" class="empty-text">暂无提交记录</view>
-          <view wx:else wx:for="{{records}}" wx:key="id" wx:for-item="record" class="submission-card">
-            <view class="submission-time">{{record.createdAt}}</view>
-            <view wx:for="{{record.values}}" wx:key="key" wx:for-item="valueItem" class="submission-row">
-              <text class="submission-key">{{valueItem.label}}</text>
-              <text class="submission-value">{{valueItem.value}}</text>
+          <block wx:else>
+            <view wx:for="{{records}}" wx:key="id" wx:for-item="record" class="submission-card">
+              <view class="submission-time">{{record.createdAt}}</view>
+              <view wx:for="{{record.values}}" wx:key="key" wx:for-item="valueItem" class="submission-row">
+                <text class="submission-key">{{valueItem.label}}</text>
+                <text class="submission-value">{{valueItem.value}}</text>
+              </view>
             </view>
-          </view>
+          </block>
         </view>
       </view>
     </view>
