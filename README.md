@@ -1,5 +1,11 @@
 # 收集工 / CollectGong
 
+**纯 Agent 项目 / Agent-only Project**
+
+本项目采用纯 Agent 工作流完成，产品功能设计、微信小程序前端、服务端、数据库逻辑、界面迭代和项目文档均由 AI Agent 协作实现。
+
+This project is built through an agent-only workflow. Product design, the WeChat Mini Program frontend, backend services, database logic, UI iterations, and documentation are implemented collaboratively by AI agents.
+
 收集工是一款用于创建、分享和管理信息收集问卷的微信小程序。问卷发起人可以配置模板并分享给填写人，在小程序中查看提交结果、删除无效数据，并将完整结果导出为 Excel。
 
 CollectGong is a WeChat Mini Program for creating, sharing, and managing information-collection forms. Form owners can configure reusable templates, share them with respondents, review or delete submissions, and export complete results to Excel.
