@@ -13,6 +13,7 @@ const baseSequelize = new Sequelize('', MYSQL_USERNAME, MYSQL_PASSWORD, {
   host,
   port,
   dialect: 'mysql',
+  timezone: '+00:00',
   logging: false,
 })
 
@@ -20,6 +21,7 @@ const sequelize = new Sequelize(database, MYSQL_USERNAME, MYSQL_PASSWORD, {
   host,
   port,
   dialect: 'mysql',
+  timezone: '+00:00',
   logging: false,
 })
 

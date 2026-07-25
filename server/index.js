@@ -8,6 +8,7 @@ const { init: initDB, User, Template, Record } = require('./db')
 const app = express()
 const logger = morgan('tiny')
 const port = process.env.PORT || 80
+const CHINA_TIME_OFFSET = 8 * 60 * 60 * 1000
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
@@ -34,13 +35,18 @@ const formatTime = (date) => {
     return ''
   }
 
-  const value = new Date(date)
+  const source = new Date(date)
+  if (Number.isNaN(source.getTime())) {
+    return ''
+  }
+
+  const value = new Date(source.getTime() + CHINA_TIME_OFFSET)
   const pad = (number) => number.toString().padStart(2, '0')
-  const year = value.getFullYear()
-  const month = pad(value.getMonth() + 1)
-  const day = pad(value.getDate())
-  const hour = pad(value.getHours())
-  const minute = pad(value.getMinutes())
+  const year = value.getUTCFullYear()
+  const month = pad(value.getUTCMonth() + 1)
+  const day = pad(value.getUTCDate())
+  const hour = pad(value.getUTCHours())
+  const minute = pad(value.getUTCMinutes())
 
   return `${year}/${month}/${day} ${hour}:${minute}`
 }
@@ -51,7 +57,7 @@ const serializeTemplate = (template) => ({
   creatorOpenid: template.creatorOpenid,
   fields: template.fields || [],
   count: template.count || 0,
-  updatedAt: template.displayUpdatedAt || formatTime(template.updatedAt),
+  updatedAt: formatTime(template.updatedAt),
 })
 
 const getOpenid = (req) => req.headers['x-wx-openid'] || ''
@@ -61,10 +67,10 @@ const sanitizeFileName = (name) => {
 }
 
 const formatDateForFileName = (date) => {
-  const value = new Date(date)
+  const value = new Date(new Date(date).getTime() + CHINA_TIME_OFFSET)
   const pad = (number) => number.toString().padStart(2, '0')
 
-  return `${value.getFullYear()}${pad(value.getMonth() + 1)}${pad(value.getDate())}`
+  return `${value.getUTCFullYear()}${pad(value.getUTCMonth() + 1)}${pad(value.getUTCDate())}`
 }
 
 app.get('/', (req, res) => {
@@ -185,7 +191,7 @@ app.post('/api/templates', async (req, res) => {
       name,
       fields: body.fields || [],
       count: 0,
-      displayUpdatedAt: body.updatedAt || formatTime(new Date()),
+      displayUpdatedAt: formatTime(new Date()),
     })
 
     sendOk(res, serializeTemplate(template))
