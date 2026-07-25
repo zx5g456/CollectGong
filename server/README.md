@@ -1,2 +1,0 @@
-# Collect Gong Server
-
