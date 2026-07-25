@@ -4,6 +4,25 @@
     <view class="title">创建问卷模板</view>
     <view class="desc">配置填写人看到的每一项内容，包括标题、说明、输入类型和示例值。</view>
 
+    <view class="import-section">
+      <view class="import-info">
+        <view class="section-title">从已有模板开始</view>
+        <view class="import-desc">复制已有模板内容，再按需修改并保存为新模板。</view>
+      </view>
+      <picker
+        wx:if="{{importTemplates.length}}"
+        class="import-picker"
+        range="{{importTemplates}}"
+        range-key="name"
+        bindchange="onImportTemplate"
+      >
+        <view class="import-button">选择模板</view>
+      </picker>
+      <button wx:else class="import-button" disabled>
+        {{loadingImportTemplates ? '加载中' : '暂无模板'}}
+      </button>
+    </view>
+
     <view class="form-section">
       <view class="section-title">模板名称</view>
       <input

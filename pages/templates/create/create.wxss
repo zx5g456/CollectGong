@@ -30,6 +30,57 @@ page {
   line-height: 1.6;
 }
 
+.import-section {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-top: 36rpx;
+  padding: 28rpx;
+  border: 1rpx solid #dce5ff;
+  border-radius: 8px;
+  background: #f7f9ff;
+}
+
+.import-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.import-desc {
+  margin-top: 10rpx;
+  color: #697386;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.import-picker {
+  flex: none;
+}
+
+.import-button {
+  flex: none;
+  min-width: 156rpx;
+  height: 72rpx;
+  margin: 0;
+  padding: 0 22rpx;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #eef3ff;
+  color: #4f7df3;
+  font-size: 26rpx;
+  line-height: 72rpx;
+  text-align: center;
+}
+
+.import-button::after {
+  border: 0;
+}
+
+.import-button[disabled] {
+  color: #9aa4b2;
+  background: #edf0f4;
+}
+
 .form-section,
 .preview-section {
   margin-top: 40rpx;

@@ -18,6 +18,8 @@ Component({
       },
     ],
     activeTypeIndex: 0,
+    importTemplates: [],
+    loadingImportTemplates: false,
     fields: [
       {
         id: 1,
@@ -29,7 +31,112 @@ Component({
       },
     ],
   },
+  lifetimes: {
+    attached() {
+      this.loadImportTemplates()
+    },
+  },
   methods: {
+    normalizeImportTemplates(templates) {
+      if (!Array.isArray(templates)) {
+        return []
+      }
+
+      return templates
+        .map((template) => {
+          const source = template && (template.dataValues || template)
+          const fields = source && Array.isArray(source.fields) ? source.fields : []
+
+          if (!source || !source.id || !fields.length) {
+            return null
+          }
+
+          return {
+            ...source,
+            name: source.name || source.templateName || '未命名模板',
+            fields,
+          }
+        })
+        .filter(Boolean)
+    },
+    async loadImportTemplates() {
+      this.setData({
+        loadingImportTemplates: true,
+      })
+
+      try {
+        const remoteTemplates = this.normalizeImportTemplates(await api.listTemplates())
+        if (remoteTemplates.length) {
+          this.setData({
+            importTemplates: remoteTemplates,
+          })
+          return
+        }
+      } catch (error) {
+        console.error('load import templates failed:', error)
+      } finally {
+        this.setData({
+          loadingImportTemplates: false,
+        })
+      }
+
+      const localTemplates = this.normalizeImportTemplates(wx.getStorageSync('templates') || [])
+      this.setData({
+        importTemplates: localTemplates,
+      })
+    },
+    hasDraftContent() {
+      return !!this.data.templateName.trim()
+        || this.data.fields.length > 1
+        || this.data.fields.some((field) => (
+          field.title || field.description || field.placeholder
+        ))
+    },
+    applyImportedTemplate(template) {
+      const importTime = Date.now()
+      const fields = template.fields.map((field, index) => ({
+        id: `import_${importTime}_${index}`,
+        title: field.title || '',
+        description: field.description || '',
+        placeholder: field.placeholder || '',
+        type: this.data.fieldTypes.some((item) => item.value === field.type)
+          ? field.type
+          : 'text',
+        required: field.required !== false,
+      }))
+
+      this.setData({
+        templateName: `${template.name}（副本）`,
+        fields,
+      })
+
+      wx.showToast({
+        title: '已导入，可继续修改',
+        icon: 'none',
+      })
+    },
+    onImportTemplate(e) {
+      const template = this.data.importTemplates[Number(e.detail.value)]
+      if (!template) {
+        return
+      }
+
+      if (!this.hasDraftContent()) {
+        this.applyImportedTemplate(template)
+        return
+      }
+
+      wx.showModal({
+        title: '导入已有模板',
+        content: '导入后将覆盖当前尚未保存的编辑内容，是否继续？',
+        confirmText: '继续导入',
+        success: (result) => {
+          if (result.confirm) {
+            this.applyImportedTemplate(template)
+          }
+        },
+      })
+    },
     onTemplateNameInput(e) {
       this.setData({
         templateName: e.detail.value,
