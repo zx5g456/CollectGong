@@ -83,6 +83,13 @@ const exportRecords = (templateId) => {
   })
 }
 
+const deleteRecord = (recordId) => {
+  return callContainer({
+    path: `/api/records/${recordId}`,
+    method: 'DELETE',
+  })
+}
+
 const submitRecord = (record) => {
   return callContainer({
     path: '/api/records',
@@ -102,5 +109,6 @@ module.exports = {
   listRecordGroups,
   listRecords,
   exportRecords,
+  deleteRecord,
   submitRecord,
 }

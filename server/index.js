@@ -355,6 +355,63 @@ app.get('/api/records/groups', async (req, res) => {
   }
 })
 
+app.delete('/api/records/:id', async (req, res) => {
+  try {
+    const openid = getOpenid(req)
+
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
+
+    const record = await Record.findByPk(req.params.id)
+    if (!record) {
+      sendFail(res, new Error('提交记录不存在'), 404)
+      return
+    }
+
+    const template = await Template.findByPk(record.templateId)
+    if (!template) {
+      sendFail(res, new Error('模板不存在'), 404)
+      return
+    }
+
+    if (template.creatorOpenid !== openid) {
+      sendFail(res, new Error('无权删除该提交记录'), 403)
+      return
+    }
+
+    await record.destroy()
+
+    const remainingCount = await Record.count({
+      where: {
+        templateId: template.id,
+      },
+    })
+    const latestRecord = await Record.findOne({
+      where: {
+        templateId: template.id,
+      },
+      order: [['createdAt', 'DESC']],
+    })
+
+    await template.update({
+      count: remainingCount,
+      displayUpdatedAt: latestRecord
+        ? formatTime(latestRecord.createdAt)
+        : formatTime(template.updatedAt),
+    })
+
+    sendOk(res, {
+      id: record.id,
+      templateId: template.id,
+      remainingCount,
+    })
+  } catch (error) {
+    sendFail(res, error)
+  }
+})
+
 app.post('/api/records', async (req, res) => {
   try {
     const body = req.body || {}

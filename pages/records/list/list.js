@@ -6,6 +6,7 @@ Component({
     records: [],
     loadingRecords: false,
     exportingTemplateId: '',
+    deletingRecordId: '',
     groups: [],
   },
   lifetimes: {
@@ -22,11 +23,9 @@ Component({
     async loadRecordGroups() {
       try {
         const groups = await api.listRecordGroups()
-        if (groups && groups.length) {
-          this.setData({
-            groups,
-          })
-        }
+        this.setData({
+          groups: Array.isArray(groups) ? groups : [],
+        })
       } catch (error) {
         console.error('load record groups failed:', error)
       }
@@ -70,16 +69,91 @@ Component({
         return []
       }
 
-      return records.map((record) => ({
-        ...record,
-        values: Array.isArray(record.values)
+      return records.map((record) => {
+        const values = Array.isArray(record.values)
           ? record.values
           : Object.keys(record.data || {}).map((key) => ({
             key,
             label: key,
             value: record.data[key],
-          })),
-      }))
+          }))
+
+        return {
+          ...record,
+          values,
+          displayValues: values.slice(0, 3),
+          hiddenValueCount: Math.max(values.length - 3, 0),
+          expanded: false,
+        }
+      })
+    },
+    onToggleRecord(e) {
+      const { id } = e.currentTarget.dataset
+
+      this.setData({
+        records: this.data.records.map((record) => {
+          if (record.id !== id || !record.hiddenValueCount) {
+            return record
+          }
+
+          const expanded = !record.expanded
+          return {
+            ...record,
+            expanded,
+            displayValues: expanded ? record.values : record.values.slice(0, 3),
+          }
+        }),
+      })
+    },
+    confirmDelete() {
+      return new Promise((resolve) => {
+        wx.showModal({
+          title: '删除提交信息',
+          content: '删除后无法恢复，且后续导出的 Excel 中将不再包含这条信息。',
+          confirmText: '删除',
+          confirmColor: '#e5484d',
+          success: (result) => resolve(!!result.confirm),
+          fail: () => resolve(false),
+        })
+      })
+    },
+    async onDeleteRecord(e) {
+      const { id } = e.currentTarget.dataset
+
+      if (this.data.deletingRecordId || !id) {
+        return
+      }
+
+      const confirmed = await this.confirmDelete()
+      if (!confirmed) {
+        return
+      }
+
+      this.setData({
+        deletingRecordId: id,
+      })
+
+      try {
+        await api.deleteRecord(id)
+        this.setData({
+          records: this.data.records.filter((record) => record.id !== id),
+        })
+        await this.loadRecordGroups()
+        wx.showToast({
+          title: '已删除',
+          icon: 'success',
+        })
+      } catch (error) {
+        console.error('delete record failed:', error)
+        wx.showToast({
+          title: error.message || '删除失败',
+          icon: 'none',
+        })
+      } finally {
+        this.setData({
+          deletingRecordId: '',
+        })
+      }
     },
     async onExportGroup(e) {
       const { id } = e.currentTarget.dataset

@@ -110,9 +110,46 @@ page {
   border-top: 1rpx solid #e7eaf0;
 }
 
+.submission-card-clickable {
+  cursor: pointer;
+}
+
+.submission-card-clickable:active {
+  opacity: 0.78;
+}
+
+.submission-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
 .submission-time {
   color: #697386;
   font-size: 24rpx;
+}
+
+.delete-button {
+  flex: none;
+  min-width: 112rpx;
+  height: 56rpx;
+  margin: 0;
+  padding: 0 20rpx;
+  border-radius: 8px;
+  background: #fff1f0;
+  color: #e5484d;
+  font-size: 24rpx;
+  line-height: 56rpx;
+}
+
+.delete-button::after {
+  border: 0;
+}
+
+.delete-button[disabled] {
+  color: #b7bec9;
+  background: #f1f3f5;
 }
 
 .submission-row {
@@ -132,4 +169,26 @@ page {
   flex: 1;
   text-align: right;
   word-break: break-all;
+}
+
+.expand-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin-top: 22rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx dashed #e7eaf0;
+  color: #4f7df3;
+  font-size: 24rpx;
+}
+
+.expand-arrow {
+  display: inline-block;
+  font-size: 28rpx;
+  transition: transform 0.2s ease;
+}
+
+.expand-arrow-up {
+  transform: rotate(180deg);
 }
