@@ -4,6 +4,7 @@ Component({
   data: {
     activeTemplateId: '',
     records: [],
+    recordsExpanded: false,
     loadingRecords: false,
     exportingTemplateId: '',
     deletingRecordId: '',
@@ -37,6 +38,7 @@ Component({
         this.setData({
           activeTemplateId: '',
           records: [],
+          recordsExpanded: false,
         })
         return
       }
@@ -44,6 +46,7 @@ Component({
       this.setData({
         activeTemplateId: id,
         records: [],
+        recordsExpanded: false,
         loadingRecords: true,
       })
 
@@ -81,7 +84,6 @@ Component({
         return {
           ...record,
           values,
-          displayValues: values.slice(0, 3),
           hiddenValueCount: Math.max(values.length - 3, 0),
           expanded: false,
         }
@@ -100,9 +102,13 @@ Component({
           return {
             ...record,
             expanded,
-            displayValues: expanded ? record.values : record.values.slice(0, 3),
           }
         }),
+      })
+    },
+    onToggleRecords() {
+      this.setData({
+        recordsExpanded: !this.data.recordsExpanded,
       })
     },
     confirmDelete() {

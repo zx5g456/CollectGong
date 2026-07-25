@@ -192,3 +192,20 @@ page {
 .expand-arrow-up {
   transform: rotate(180deg);
 }
+
+.records-expand-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  min-height: 76rpx;
+  margin-top: 16rpx;
+  border-radius: 8px;
+  background: #eef3ff;
+  color: #4f7df3;
+  font-size: 26rpx;
+}
+
+.records-expand-button:active {
+  opacity: 0.78;
+}

@@ -29,35 +29,53 @@
           <view wx:if="{{loadingRecords}}" class="empty-text">加载中...</view>
           <view wx:elif="{{!records.length}}" class="empty-text">暂无提交记录</view>
           <block wx:else>
-            <view
+            <block
               wx:for="{{records}}"
               wx:key="id"
               wx:for-item="record"
-              class="submission-card {{record.hiddenValueCount ? 'submission-card-clickable' : ''}}"
-              bindtap="onToggleRecord"
-              data-id="{{record.id}}"
+              wx:for-index="recordIndex"
             >
-              <view class="submission-header">
-                <view class="submission-time">{{record.createdAt}}</view>
-                <button
-                  class="delete-button"
-                  catchtap="onDeleteRecord"
-                  data-id="{{record.id}}"
-                  loading="{{deletingRecordId === record.id}}"
-                  disabled="{{!!deletingRecordId || !!exportingTemplateId}}"
+              <view
+                wx:if="{{recordsExpanded || recordIndex < 3}}"
+                class="submission-card {{record.hiddenValueCount ? 'submission-card-clickable' : ''}}"
+                bindtap="onToggleRecord"
+                data-id="{{record.id}}"
+              >
+                <view class="submission-header">
+                  <view class="submission-time">{{record.createdAt}}</view>
+                  <button
+                    class="delete-button"
+                    catchtap="onDeleteRecord"
+                    data-id="{{record.id}}"
+                    loading="{{deletingRecordId === record.id}}"
+                    disabled="{{!!deletingRecordId || !!exportingTemplateId}}"
+                  >
+                    删除
+                  </button>
+                </view>
+                <block
+                  wx:for="{{record.values}}"
+                  wx:key="key"
+                  wx:for-item="valueItem"
+                  wx:for-index="valueIndex"
                 >
-                  删除
-                </button>
+                  <view wx:if="{{record.expanded || valueIndex < 3}}" class="submission-row">
+                    <text class="submission-key">{{valueItem.label}}</text>
+                    <text class="submission-value">{{valueItem.value}}</text>
+                  </view>
+                </block>
+                <view wx:if="{{record.hiddenValueCount}}" class="expand-hint">
+                  <text wx:if="{{record.expanded}}">收起填写项</text>
+                  <text wx:else>展开其余 {{record.hiddenValueCount}} 个填写项</text>
+                  <text class="expand-arrow {{record.expanded ? 'expand-arrow-up' : ''}}">⌄</text>
+                </view>
               </view>
-              <view wx:for="{{record.displayValues}}" wx:key="key" wx:for-item="valueItem" class="submission-row">
-                <text class="submission-key">{{valueItem.label}}</text>
-                <text class="submission-value">{{valueItem.value}}</text>
-              </view>
-              <view wx:if="{{record.hiddenValueCount}}" class="expand-hint">
-                <text wx:if="{{record.expanded}}">收起</text>
-                <text wx:else>展开其余 {{record.hiddenValueCount}} 项</text>
-                <text class="expand-arrow {{record.expanded ? 'expand-arrow-up' : ''}}">⌄</text>
-              </view>
+            </block>
+
+            <view wx:if="{{records.length > 3}}" class="records-expand-button" bindtap="onToggleRecords">
+              <text wx:if="{{recordsExpanded}}">收起较早的提交记录</text>
+              <text wx:else>查看其余 {{records.length - 3}} 条提交记录</text>
+              <text class="expand-arrow {{recordsExpanded ? 'expand-arrow-up' : ''}}">⌄</text>
             </view>
           </block>
         </view>
