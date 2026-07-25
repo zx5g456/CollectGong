@@ -34,17 +34,22 @@ page {
   margin-top: 36rpx;
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 16rpx;
+}
+
+.template-swipe-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 12rpx 36rpx rgba(20, 31, 51, 0.06);
 }
 
 .template-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 32rpx;
-  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+  padding: 24rpx 26rpx;
   background: #ffffff;
-  box-shadow: 0 12rpx 36rpx rgba(20, 31, 51, 0.06);
+  transition: transform 0.18s ease;
 }
 
 .template-card:active {
@@ -62,42 +67,93 @@ page {
 }
 
 .template-info {
-  flex: 1;
   min-width: 0;
+  padding-right: 140rpx;
+}
+
+.template-main {
+  position: relative;
+  min-height: 52rpx;
 }
 
 .template-name {
   color: #17233d;
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
+  line-height: 1.35;
+  word-break: break-all;
 }
 
 .template-meta {
-  margin-top: 12rpx;
+  margin-top: 8rpx;
   color: #697386;
-  font-size: 25rpx;
-  line-height: 1.5;
+  font-size: 23rpx;
+  line-height: 1.4;
 }
 
-.template-view-hint {
-  margin-top: 10rpx;
-  color: #4f7df3;
+.share-button-wrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120rpx;
+  height: 52rpx;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #07c160;
+}
+
+.share-button-label {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  color: #ffffff;
   font-size: 23rpx;
+  line-height: 52rpx;
+  text-align: center;
+  pointer-events: none;
 }
 
 .share-button {
-  flex: none;
-  width: 132rpx;
-  min-width: 132rpx;
-  height: 72rpx;
-  margin-left: 24rpx;
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  width: 120rpx;
+  min-width: 120rpx;
+  height: 52rpx;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  opacity: 0;
+}
+
+.swipe-delete-action {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 144rpx;
+  height: 100%;
+  margin: 0;
   padding: 0;
   box-sizing: border-box;
-  border-radius: 8px;
-  background: #07c160;
+  border-radius: 0;
+  background: #e5484d;
   color: #ffffff;
-  font-size: 28rpx;
-  line-height: 72rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.swipe-delete-action-disabled {
+  background: #c5cad3;
 }
 
 .share-button::after {

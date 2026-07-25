@@ -3,7 +3,13 @@ const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
 const ExcelJS = require('exceljs')
-const { init: initDB, User, Template, Record } = require('./db')
+const {
+  init: initDB,
+  sequelize,
+  User,
+  Template,
+  Record,
+} = require('./db')
 
 const app = express()
 const logger = morgan('tiny')
@@ -165,6 +171,48 @@ app.get('/api/templates/:id', async (req, res) => {
     }
 
     sendOk(res, serializeTemplate(template))
+  } catch (error) {
+    sendFail(res, error)
+  }
+})
+
+app.delete('/api/templates/:id', async (req, res) => {
+  try {
+    const openid = getOpenid(req)
+
+    if (!openid) {
+      sendFail(res, new Error('未获取到微信用户 openid'), 401)
+      return
+    }
+
+    const template = await Template.findByPk(req.params.id)
+    if (!template) {
+      sendFail(res, new Error('模板不存在'), 404)
+      return
+    }
+
+    if (template.creatorOpenid !== openid) {
+      sendFail(res, new Error('无权删除该模板'), 403)
+      return
+    }
+
+    const deletedRecordCount = await sequelize.transaction(async (transaction) => {
+      const count = await Record.destroy({
+        where: {
+          templateId: template.id,
+        },
+        transaction,
+      })
+      await template.destroy({
+        transaction,
+      })
+      return count
+    })
+
+    sendOk(res, {
+      id: template.id,
+      deletedRecordCount,
+    })
   } catch (error) {
     sendFail(res, error)
   }

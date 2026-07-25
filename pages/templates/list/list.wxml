@@ -9,24 +9,45 @@
       <view
         wx:for="{{templates}}"
         wx:key="id"
-        class="template-card"
-        bindtap="onOpenTemplate"
-        data-id="{{item.id}}"
+        class="template-swipe-item"
       >
-        <view class="template-info">
-          <view class="template-name">{{item.name}}</view>
-          <view class="template-meta">已收集 {{item.count}} 条 · {{item.updatedAt}}</view>
-          <view class="template-view-hint">点击查看模板</view>
-        </view>
-        <button
-          class="share-button"
-          open-type="share"
-          catchtap="onShareTemplate"
+        <view
+          class="swipe-delete-action {{deletingTemplateId === item.id ? 'swipe-delete-action-disabled' : ''}}"
+          catchtap="onDeleteTemplate"
           data-id="{{item.id}}"
           data-name="{{item.name}}"
         >
-          分享
-        </button>
+          <text>{{deletingTemplateId === item.id ? '删除中' : '删除'}}</text>
+        </view>
+
+        <view
+          class="template-card"
+          style="transform: translateX(-{{item.swipeOffset}}rpx);"
+          bindtap="onOpenTemplate"
+          bindtouchstart="onTemplateTouchStart"
+          bindtouchmove="onTemplateTouchMove"
+          bindtouchend="onTemplateTouchEnd"
+          bindtouchcancel="onTemplateTouchEnd"
+          data-id="{{item.id}}"
+        >
+          <view class="template-main">
+            <view class="template-info">
+              <view class="template-name">{{item.name}}</view>
+              <view class="template-meta">已收集 {{item.count}} 条 · {{item.updatedAt}}</view>
+            </view>
+            <view class="share-button-wrap">
+              <view class="share-button-label">分享</view>
+              <button
+                class="share-button"
+                open-type="share"
+                catchtap="onShareTemplate"
+                data-id="{{item.id}}"
+                data-name="{{item.name}}"
+                disabled="{{!!deletingTemplateId}}"
+              ></button>
+            </view>
+          </view>
+        </view>
       </view>
     </view>
   </view>

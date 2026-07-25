@@ -65,6 +65,13 @@ const getTemplate = (templateId) => {
   })
 }
 
+const deleteTemplate = (templateId) => {
+  return callContainer({
+    path: `/api/templates/${templateId}`,
+    method: 'DELETE',
+  })
+}
+
 const listRecordGroups = () => {
   return callContainer({
     path: '/api/records/groups',
@@ -106,6 +113,7 @@ module.exports = {
   createTemplate,
   listTemplates,
   getTemplate,
+  deleteTemplate,
   listRecordGroups,
   listRecords,
   exportRecords,
