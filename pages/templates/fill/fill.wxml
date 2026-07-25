@@ -9,6 +9,12 @@
 
     <view wx:elif="{{!template}}" class="empty-card">模板不存在或已失效</view>
 
+    <view wx:elif="{{submitted}}" class="success-card">
+      <view class="success-icon">✓</view>
+      <view class="success-title">提交成功</view>
+      <view class="success-desc">信息已发送给问卷发起人，现在可以关闭此页面了。</view>
+    </view>
+
     <view wx:else class="form-card">
       <view wx:for="{{fields}}" wx:key="id" class="field-item">
         <view class="field-title">{{index + 1}}. {{item.title}}</view>

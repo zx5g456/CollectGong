@@ -8,6 +8,7 @@ Page({
     formData: {},
     loading: true,
     submitting: false,
+    submitted: false,
     previewMode: false,
   },
 
@@ -91,12 +92,9 @@ Page({
         templateId: this.data.templateId,
         data: this.data.formData,
       })
-      wx.showToast({
-        title: '已提交',
-        icon: 'success',
-      })
       this.setData({
         formData: {},
+        submitted: true,
       })
     } catch (error) {
       console.error('submit record failed:', error)

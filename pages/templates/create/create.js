@@ -234,25 +234,33 @@ Component({
         mask: true,
       })
 
+      let resultTitle = '创建成功'
+      let resultIcon = 'success'
+
       try {
         const savedTemplate = await api.createTemplate(template)
         const nextTemplate = savedTemplate && savedTemplate.name ? savedTemplate : template
 
         wx.setStorageSync('templates', [nextTemplate].concat(templates))
-        wx.showToast({
-          title: '已保存',
-          icon: 'success',
-        })
       } catch (error) {
         console.error('save template failed:', error)
         wx.setStorageSync('templates', [template].concat(templates))
-        wx.showToast({
-          title: '已本地保存',
-          icon: 'none',
-        })
+        resultTitle = '已保存到本地'
+        resultIcon = 'none'
       } finally {
         wx.hideLoading()
       }
+
+      wx.reLaunch({
+        url: '/pages/index/index',
+        success: () => {
+          wx.showToast({
+            title: resultTitle,
+            icon: resultIcon,
+            duration: 1500,
+          })
+        },
+      })
     },
     formatTime(date) {
       const formatNumber = (n) => {

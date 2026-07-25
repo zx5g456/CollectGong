@@ -118,6 +118,7 @@ Page({
     return {
       title: `请填写：${templateName}`,
       path,
+      imageUrl: '/assets/share-logo.png',
     }
   },
 })

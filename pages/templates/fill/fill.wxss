@@ -31,7 +31,8 @@ page {
 }
 
 .empty-card,
-.form-card {
+.form-card,
+.success-card {
   margin-top: 36rpx;
   padding: 32rpx;
   border-radius: 8px;
@@ -43,6 +44,37 @@ page {
   color: #697386;
   font-size: 28rpx;
   text-align: center;
+}
+
+.success-card {
+  padding: 72rpx 40rpx;
+  text-align: center;
+}
+
+.success-icon {
+  width: 112rpx;
+  height: 112rpx;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #07c160;
+  color: #ffffff;
+  font-size: 64rpx;
+  font-weight: 600;
+  line-height: 112rpx;
+}
+
+.success-title {
+  margin-top: 32rpx;
+  color: #17233d;
+  font-size: 38rpx;
+  font-weight: 700;
+}
+
+.success-desc {
+  margin-top: 20rpx;
+  color: #697386;
+  font-size: 28rpx;
+  line-height: 1.7;
 }
 
 .field-item + .field-item {
