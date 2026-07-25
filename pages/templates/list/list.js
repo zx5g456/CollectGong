@@ -132,6 +132,23 @@ Page({
     }
   },
 
+  getTouchPoint(touch) {
+    if (!touch) {
+      return null
+    }
+
+    const x = Number.isFinite(touch.clientX) ? touch.clientX : touch.pageX
+    const y = Number.isFinite(touch.clientY) ? touch.clientY : touch.pageY
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      return null
+    }
+
+    return {
+      x,
+      y,
+    }
+  },
+
   updateSwipeOffset(id, offset) {
     const index = this.data.templates.findIndex((item) => `${item.id}` === `${id}`)
     if (index < 0) {
@@ -144,19 +161,26 @@ Page({
   },
 
   closeSwipeActions(exceptId = '') {
-    const templates = this.data.templates.map((template) => ({
-      ...template,
-      swipeOffset: `${template.id}` === `${exceptId}` ? template.swipeOffset : 0,
-    }))
+    const hasOpenAction = this.data.templates.some((template) => (
+      `${template.id}` !== `${exceptId}` && template.swipeOffset
+    ))
+    if (!hasOpenAction) {
+      return
+    }
+
     this.setData({
-      templates,
+      templates: this.data.templates.map((template) => ({
+        ...template,
+        swipeOffset: `${template.id}` === `${exceptId}` ? template.swipeOffset : 0,
+      })),
     })
   },
 
   onTemplateTouchStart(e) {
     const touch = e.touches && e.touches[0]
+    const point = this.getTouchPoint(touch)
     const { id } = e.currentTarget.dataset
-    if (!touch || !id) {
+    if (!point || !id) {
       return
     }
 
@@ -164,41 +188,34 @@ Page({
     this.closeSwipeActions(id)
     this.swipeGesture = {
       id,
-      startX: touch.clientX,
-      startY: touch.clientY,
+      startX: point.x,
+      startY: point.y,
       initialOffset: template ? template.swipeOffset : 0,
       offset: template ? template.swipeOffset : 0,
       horizontal: false,
     }
   },
 
-  onTemplateTouchMove(e) {
-    const touch = e.touches && e.touches[0]
-    const gesture = this.swipeGesture
-    if (!touch || !gesture) {
-      return
-    }
-
-    const deltaX = touch.clientX - gesture.startX
-    const deltaY = touch.clientY - gesture.startY
-    if (!gesture.horizontal && Math.abs(deltaX) <= Math.abs(deltaY)) {
-      return
-    }
-
-    gesture.horizontal = true
-    const actionWidth = this.getSwipeActionWidth()
-    const offset = Math.max(0, Math.min(
-      actionWidth,
-      gesture.initialOffset - deltaX * this.getRpxRatio(),
-    ))
-    gesture.offset = offset
-    this.updateSwipeOffset(gesture.id, offset)
-  },
-
-  onTemplateTouchEnd() {
+  onTemplateTouchEnd(e) {
     const gesture = this.swipeGesture
     if (!gesture) {
       return
+    }
+
+    const touch = e.changedTouches && e.changedTouches[0]
+    const point = this.getTouchPoint(touch)
+    if (point) {
+      const deltaX = point.x - gesture.startX
+      const deltaY = point.y - gesture.startY
+      if (Math.abs(deltaX) >= 24 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        gesture.horizontal = true
+        gesture.offset = Math.max(0, Math.min(
+          this.getSwipeActionWidth(),
+          gesture.initialOffset - deltaX * this.getRpxRatio(),
+        ))
+      } else {
+        gesture.horizontal = false
+      }
     }
 
     if (gesture.horizontal) {

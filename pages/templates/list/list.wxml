@@ -25,7 +25,6 @@
           style="transform: translateX(-{{item.swipeOffset}}rpx);"
           bindtap="onOpenTemplate"
           bindtouchstart="onTemplateTouchStart"
-          bindtouchmove="onTemplateTouchMove"
           bindtouchend="onTemplateTouchEnd"
           bindtouchcancel="onTemplateTouchEnd"
           data-id="{{item.id}}"
