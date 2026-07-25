@@ -8,15 +8,18 @@ Page({
     formData: {},
     loading: true,
     submitting: false,
+    previewMode: false,
   },
 
   onLoad(options) {
     const templateId = options.templateId || ''
+    const previewMode = options.preview === '1'
 
     console.log('fill page options:', options)
 
     this.setData({
       templateId,
+      previewMode,
     })
 
     this.loadTemplate(templateId)
@@ -59,7 +62,7 @@ Page({
   },
 
   async onSubmit() {
-    if (this.data.submitting) {
+    if (this.data.previewMode || this.data.submitting) {
       return
     }
 

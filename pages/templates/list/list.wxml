@@ -6,15 +6,22 @@
 
     <view class="template-list">
       <view wx:if="{{!templates.length}}" class="empty-card">暂无模板</view>
-      <view wx:for="{{templates}}" wx:key="id" class="template-card">
+      <view
+        wx:for="{{templates}}"
+        wx:key="id"
+        class="template-card"
+        bindtap="onOpenTemplate"
+        data-id="{{item.id}}"
+      >
         <view class="template-info">
           <view class="template-name">{{item.name}}</view>
           <view class="template-meta">已收集 {{item.count}} 条 · {{item.updatedAt}}</view>
+          <view class="template-view-hint">点击查看模板</view>
         </view>
         <button
           class="share-button"
           open-type="share"
-          bindtap="onShareTemplate"
+          catchtap="onShareTemplate"
           data-id="{{item.id}}"
           data-name="{{item.name}}"
         >

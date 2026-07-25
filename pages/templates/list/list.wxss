@@ -47,6 +47,10 @@ page {
   box-shadow: 0 12rpx 36rpx rgba(20, 31, 51, 0.06);
 }
 
+.template-card:active {
+  opacity: 0.78;
+}
+
 .empty-card {
   padding: 48rpx 32rpx;
   border-radius: 8px;
@@ -73,6 +77,12 @@ page {
   color: #697386;
   font-size: 25rpx;
   line-height: 1.5;
+}
+
+.template-view-hint {
+  margin-top: 10rpx;
+  color: #4f7df3;
+  font-size: 23rpx;
 }
 
 .share-button {

@@ -1,8 +1,9 @@
-<navigation-bar title="填写信息" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+<navigation-bar title="{{previewMode ? '查看模板' : '填写信息'}}" back="{{true}}" color="black" background="#FFF"></navigation-bar>
 <scroll-view class="scrollarea" scroll-y type="list">
   <view class="page">
     <view class="title">{{template.name || '填写信息'}}</view>
-    <view class="desc">请根据表单要求填写信息，提交后发起人可以在收集信息中查看。</view>
+    <view wx:if="{{previewMode}}" class="desc">模板预览，仅展示填写项，不会提交信息。</view>
+    <view wx:else class="desc">请根据表单要求填写信息，提交后发起人可以在收集信息中查看。</view>
 
     <view wx:if="{{loading}}" class="empty-card">加载中...</view>
 
@@ -17,12 +18,14 @@
           type="{{item.type}}"
           placeholder="{{item.placeholder || '请输入'}}"
           value="{{formData[item.id]}}"
+          disabled="{{previewMode}}"
           data-field-id="{{item.id}}"
           bindinput="onInputChange"
         />
       </view>
 
       <button
+        wx:if="{{!previewMode}}"
         class="submit-button"
         loading="{{submitting}}"
         disabled="{{submitting}}"

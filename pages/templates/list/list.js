@@ -93,6 +93,18 @@ Page({
     })
   },
 
+  onOpenTemplate(e) {
+    const { id } = e.currentTarget.dataset
+
+    if (!id) {
+      return
+    }
+
+    wx.navigateTo({
+      url: `/pages/templates/fill/fill?templateId=${encodeURIComponent(id)}&preview=1`,
+    })
+  },
+
   onShareTemplate() {},
 
   onShareAppMessage(res) {
