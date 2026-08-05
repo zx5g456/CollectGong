@@ -9,6 +9,7 @@ const {
   User,
   Template,
   Record,
+  retryDatabaseRead,
 } = require('./db')
 
 const app = express()
@@ -147,13 +148,13 @@ app.get('/api/templates', async (req, res) => {
       return
     }
 
-    const templates = await Template.findAll({
+    const templates = await retryDatabaseRead(() => Template.findAll({
       where: {
         creatorOpenid: openid,
       },
       order: [['createdAt', 'DESC']],
       limit: 100,
-    })
+    }))
 
     sendOk(res, templates.map(serializeTemplate))
   } catch (error) {
@@ -374,15 +375,15 @@ app.get('/api/records/groups', async (req, res) => {
       return
     }
 
-    const templates = await Template.findAll({
+    const templates = await retryDatabaseRead(() => Template.findAll({
       where: {
         creatorOpenid: openid,
       },
       order: [['createdAt', 'DESC']],
       limit: 100,
-    })
+    }))
 
-    const groups = await Promise.all(templates.map(async (template) => {
+    const groups = await retryDatabaseRead(() => Promise.all(templates.map(async (template) => {
       const count = await Record.count({
         where: {
           templateId: template.id,
@@ -401,7 +402,7 @@ app.get('/api/records/groups', async (req, res) => {
         count,
         latestAt: latestRecord ? formatTime(latestRecord.createdAt) : serializeTemplate(template).updatedAt,
       }
-    }))
+    })))
 
     sendOk(res, groups)
   } catch (error) {

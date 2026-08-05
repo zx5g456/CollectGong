@@ -9,12 +9,24 @@ const {
 const [host, port] = MYSQL_ADDRESS.split(':')
 const database = 'collect_gong'
 
+const pool = {
+  max: 5,
+  min: 0,
+  acquire: 10000,
+  idle: 10000,
+  evict: 1000,
+}
+
 const baseSequelize = new Sequelize('', MYSQL_USERNAME, MYSQL_PASSWORD, {
   host,
   port,
   dialect: 'mysql',
   timezone: '+00:00',
   logging: false,
+  pool,
+  dialectOptions: {
+    connectTimeout: 10000,
+  },
 })
 
 const sequelize = new Sequelize(database, MYSQL_USERNAME, MYSQL_PASSWORD, {
@@ -23,6 +35,10 @@ const sequelize = new Sequelize(database, MYSQL_USERNAME, MYSQL_PASSWORD, {
   dialect: 'mysql',
   timezone: '+00:00',
   logging: false,
+  pool,
+  dialectOptions: {
+    connectTimeout: 10000,
+  },
 })
 
 const User = sequelize.define('User', {
@@ -109,10 +125,46 @@ async function init() {
   await Record.sync({ alter: true })
 }
 
+const TRANSIENT_CONNECTION_ERROR_CODES = new Set([
+  'ECONNRESET',
+  'ETIMEDOUT',
+  'EPIPE',
+  'PROTOCOL_CONNECTION_LOST',
+])
+
+const isTransientConnectionError = (error) => {
+  const candidates = [error, error && error.parent, error && error.original]
+  return candidates.some((candidate) => (
+    candidate && (
+      TRANSIENT_CONNECTION_ERROR_CODES.has(candidate.code)
+      || TRANSIENT_CONNECTION_ERROR_CODES.has(candidate.errno)
+    )
+  ))
+}
+
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds))
+
+// Only use this for reads: retrying writes after a dropped connection can duplicate data.
+async function retryDatabaseRead(operation, maxRetries = 2) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await operation()
+    } catch (error) {
+      if (!isTransientConnectionError(error) || attempt >= maxRetries) {
+        throw error
+      }
+
+      console.warn(`Database connection was reset; retrying read (${attempt + 1}/${maxRetries})`)
+      await wait(100 * (attempt + 1))
+    }
+  }
+}
+
 module.exports = {
   init,
   sequelize,
   User,
   Template,
   Record,
+  retryDatabaseRead,
 }
